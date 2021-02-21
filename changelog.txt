@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.1.0
+Date: 2021-02-20
+  Features:
+    - Player is teleported to the factory once they spawn and the cutscene ends (if present)
+    - All Factorissimo research unlocked for the start
