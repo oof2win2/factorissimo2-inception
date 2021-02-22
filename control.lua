@@ -66,6 +66,14 @@ script.on_event(defines.events.on_player_created, function(event)
     surface.create_entity{name="pipe", force="player", direction=defines.direction.west, position={x=18, y=15}}
     surface.create_entity{name="infinity-pipe", position={x=19, y=15}, force="player"}.set_infinity_pipe_filter({name="water", percentage=100.0})
 
+    surface.create_entity{name="infinity-chest", position={x=-2, y=6}, force="player"}.set_infinity_container_filter(1, {name="stone", count=50})
+    surface.create_entity{name="express-loader", position={x=0, y=6}, direction=defines.direction.east, force="player", type="output"}
+    surface.create_entity{name="express-transport-belt", position={x=1, y=6}, direction=defines.direction.east, force="player"}
+    surface.create_entity{name="infinity-chest", position={x=-2, y=7}, force="player"}.set_infinity_container_filter(1, {name="stone", count=50})
+    surface.create_entity{name="express-loader", position={x=0, y=7}, direction=defines.direction.east, force="player", type="output"}
+    surface.create_entity{name="express-transport-belt", position={x=1, y=7}, direction=defines.direction.east, force="player"}
+
+
     local factorySurface = game.get_surface("Factory floor 1")
     -- iron belts inside
     factorySurface.create_entity{name="express-transport-belt", position={x=-25, y=30}, direction=defines.direction.north, force="player", raise_built=true}
@@ -80,15 +88,18 @@ script.on_event(defines.events.on_player_created, function(event)
     factorySurface.create_entity{name="express-transport-belt", position={x=24, y=30}, direction=defines.direction.north, force="player", raise_built=true}
 
     -- random stuff inside
-    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=5}, direction=defines.direction.east, force="player", raise_built=true}
-    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=9}, direction=defines.direction.east, force="player", raise_built=true}
-    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=20}, direction=defines.direction.east, force="player", raise_built=true}
-    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=24}, direction=defines.direction.east, force="player", raise_built=true}
+    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=5}, direction=defines.direction.east, force="player", raise_built=true}      -- uranium ore
+    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=9}, direction=defines.direction.east, force="player", raise_built=true}      -- coal
+    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=20}, direction=defines.direction.east, force="player", raise_built=true}     -- coal
+    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=24}, direction=defines.direction.east, force="player", raise_built=true}     -- coal
 
-    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=5}, raise_built=true}
-    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=9}, raise_built=true}
-    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=20}, raise_built=true}
-    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=24}, raise_built=true}
+    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=5}, raise_built=true}       -- crude oil
+    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=9}, raise_built=true}       -- crude oil
+    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=20}, raise_built=true}      -- water
+    factorySurface.create_entity{name="factory-input-pipe", force="player", direction=defines.direction.east, position={x=30, y=24}, raise_built=true}      -- water
+    
+    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=-10}, direction=defines.direction.east, force="player", raise_built=true} -- stone
+    factorySurface.create_entity{name="express-transport-belt", position={x=-31, y=-6}, direction=defines.direction.east, force="player", raise_built=true}  -- stone
 
     -- barrier to not get out :P
     factorySurface.create_entity{name="steel-chest", force="enemy", position={x=-3, y=32}}
