@@ -3,6 +3,7 @@ script.on_event(defines.events.on_player_created, function(event)
     if event.player_index ~= 1 then 
         -- teleport the player to the main factory surface
         player.teleport({x=0, y=31}, "Factory floor 1")
+        return
     end
     local surface = player.surface
 
