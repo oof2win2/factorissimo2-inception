@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2021-03-21
+  Changes:
+    - Inputs can now be selected with a combinator GUI
+    - Multiple belts/pipes for inputs for each resource (research based, not free!)
+    - Support for fluids and items (though the GUI displays fluids as barrels)
+---------------------------------------------------------------------------------------------------
 Version: 0.1.4
 Date: 2021-02-24
   Bugfixes:
