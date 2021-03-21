@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2021-03-22
+  Bugfixes:
+    - Fixed a bug where inputs would still be free
+    - Fixed scenario issues where you could see migrations run as EE was active with previous scenario creation
+---------------------------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2021-03-21
   Changes:

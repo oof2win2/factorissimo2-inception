@@ -1,5 +1,51 @@
 local factoryStatic = require("statics.factoryInputs")
 
+--[[
+    TODO: global.availableItems needs to be turned into an array
+    TODO: global.availableItems items need to be in format {name=name, amount=amount} so they can be accessed even if no more items area available (for removal and re-addition)
+]]
+
+local function create_buttons(player)
+    local selector_filter = {}
+    for _, item in pairs(global.availableItems) do
+        if item.name and item.amount >= 1 then
+            table.insert(selector_filter, {filter="name", name=item.name})
+        end
+    end
+    if selector_filter[1] == nil then
+        log("blank")
+        table.insert(selector_filter, {filter="stack-size", comparison="=", value=100000})
+    end
+    
+    local function createButtons(flow, button, direction)
+        button.tags.direction = direction
+        flow.clear()
+        for i = 1, 4, 1 do
+            button.tags.num = i
+            local itemname = global.selected[button.tags.direction][button.tags.num]
+            button.item = itemname
+            flow.add(button)
+            button.item = nil
+        end
+        flow.add{type="sprite", name="dummy_buttons_button", sprite="tile/lab-dark-2"}
+        for i = 5, 8, 1 do
+            button.tags.num = i
+            local itemname = global.selected[button.tags.direction][button.tags.num]
+            button.item = itemname
+            flow.add(button)
+            button.item = nil
+        end
+    end
+    local button = {type="choose-elem-button", tags={action="f2pl_select_item"}, flow="vertical", elem_type="item", elem_filters=selector_filter}
+    local top_content = player.opened.content_frame.top_content
+    local mid_content = player.opened.content_frame.mid_content
+    local bot_content = player.opened.content_frame.bot_content
+    createButtons(mid_content.children[1], button, defines.direction.west)
+    createButtons(mid_content.children[3], button, defines.direction.east)
+    createButtons(top_content.children[1], button, defines.direction.north)
+    createButtons(bot_content.children[1], button, defines.direction.south)
+end
+
 local function create_interface(player)
     local screen = player.gui.screen
     local player_global = global.players[player.index]
@@ -11,7 +57,7 @@ local function create_interface(player)
         main_frame.auto_center = true
 
         local content_frame = main_frame.add{type="frame", name="content_frame", direction="vertical"}
-        local content_table = content_frame.add{type="table", name="content_table", column_count=3}
+        -- local content_table = content_frame.add{type="table", name="content_table", column_count=3}
 
         -- flow setup
         local top_content = content_frame.add{type="flow", name="top_content", style="f2pl_horizontal_centerflow"}
@@ -21,7 +67,7 @@ local function create_interface(player)
         local top_buttons_flow = top_content.add{type="flow", name="top_buttons_flow", direction="horizontal", style="f2pl_horizontal_centerflow"}
         local left_buttons_flow = mid_content.add{type="flow", name="left_buttons_flow", direction="vertical"}
         local preview_flow = mid_content.add{type="flow", name="preview_flow", direction="horizontal"}
-        local right_buttons_flow = mid_content.add{type="flow", name="righht_buttons_flow", direction="vertical"}
+        local right_buttons_flow = mid_content.add{type="flow", name="right_buttons_flow", direction="vertical"}
         local bottom_buttons_flow = bot_content.add{type="flow", name="bottom_buttons_flow", direction="horizontal", style="f2pl_horizontal_centerflow"}
         
         local entity = game.get_surface(global.factory.placed_on_surface_name).find_entity(global.factory.name, global.factory.position)
@@ -40,39 +86,10 @@ local function create_interface(player)
         bottom_buttons_flow.style.vertical_align = "center"
         bottom_buttons_flow.style.horizontally_stretchable = true
 
-        local selector_filter = {}
-        for item_name, amount in pairs(global.availableItems) do
-            table.insert(selector_filter, {filter="name", name=item_name})
-        end
-        
-        local function createButtons(flow, button, direction)
-            button.tags.direction = direction
-            for i = 1, 4, 1 do
-                button.tags.num = i
-                local itemname = global.selected[button.tags.direction][button.tags.num]
-                button.item = itemname
-                flow.add(button)
-                button.item = nil
-            end
-            flow.add{type="sprite", name="dummy_buttons_button", sprite="tile/lab-dark-2"}
-            for i = 5, 8, 1 do
-                button.tags.num = i
-                local itemname = global.selected[button.tags.direction][button.tags.num]
-                button.item = itemname
-                flow.add(button)
-                button.item = nil
-            end
-        end
-        local button = {type="choose-elem-button", tags={action="f2pl_select_item"}, flow="vertical", elem_type="item", elem_filters=selector_filter}
-        createButtons(left_buttons_flow, button, defines.direction.west)
-        createButtons(right_buttons_flow, button, defines.direction.east)
-        createButtons(top_buttons_flow, button, defines.direction.north)
-        createButtons(bottom_buttons_flow, button, defines.direction.south)
-        
-
         player_global.elements.main_frame = main_frame
-        -- player_global.elements.
         player.opened = main_frame
+
+        create_buttons(player)
     end
 end
 
@@ -123,7 +140,6 @@ end
 local function remove_input(direction, id)
     local indoorSurface = game.get_surface(global.factory.surface_name)
     local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
-    local belt_tier_name = global.belt_tier_name
     local entityDirection = direction + 4
     if entityDirection >= 8 then entityDirection = entityDirection - 8 end
     local outdoorPos = factoryStatic.outdoorPos.positions[direction]
@@ -141,10 +157,38 @@ local function remove_input(direction, id)
     local outside = outdoorSurface.find_entities({outdoorBeltPosition, chestPosition})
     local inside = indoorSurface.find_entities({indoorBulkpipePosition, indoorBeltPosition})
     for _, entity in pairs(outside) do
+        if entity.name == "infinity-pipe" then
+            local filter = entity.get_infinity_pipe_filter(1)
+            if filter ~= nil then
+                if global.availableItems[filter.name .. "-barrel"] ~= nil then
+                    global.availableItems[filter.name .. "-barrel"].amount = global.availableItems[filter.name .. "-barrel"].amount + 1
+                else
+                    global.availableItems[filter.name .. "-barrel"] = {name= filter.name.."-barrel", amount=1}
+                end
+            end
+        elseif entity.name == "infinity-chest" then
+            local filter = entity.get_infinity_container_filter(1)
+            if filter ~= nil then
+                if global.availableItems[filter.name] ~= nil then
+                    global.availableItems[filter.name].amount = global.availableItems[filter.name].amount + 1
+                else
+                    global.availableItems[filter.name].amount = 1
+                end
+            end
+        end
         entity.destroy({raise_destroy = true})
     end
     for _, entity in pairs(inside) do
         entity.destroy({raise_destroy = true})
+    end
+end
+
+local function change_input(name, amount)
+    local input = global.availableItems[name]
+    if input and input.amount then
+        input.amount = input.amount + amount
+    else
+        global.availableItems[name] = {name=name, amount=0}
     end
 end
 
@@ -154,11 +198,14 @@ local function on_gui_elem_changed(event)
     global.selected[element.tags.direction][element.tags.num] = element.elem_value
     if element.elem_value ~= nil and element.elem_value:find("barrel") == nil  then
         set_item_input(element.tags.direction, element.tags.num, element.elem_value)
+        change_input(element.elem_value, -1)
     elseif element.elem_value ~= nil and element.elem_value:find("barrel") ~= nil then
         set_fluid_input(element.tags.direction, element.tags.num, element.elem_value)
+        change_input(element.elem_value, -1)
     else
         remove_input(element.tags.direction, element.tags.num)
     end
+    create_buttons(game.get_player(event.player_index))
 end
 
 local function toggle_interface(player)
@@ -201,9 +248,9 @@ guis.events = {
         if event.research.name:find("factory%-extra%-") ~= nil then
             local resource = event.research.name:sub(15):sub(1, -3)
             if global.availableItems[resource] ~= nil then
-                global.availableItems[resource] = global.availableItems[resource] + 1
+                global.availableItems[resource].amount = global.availableItems[resource].amount + 1
             else
-                global.availableItems[resource] = 1
+                global.availableItems[resource] = {name=resource, amount=1}
             end
         end
     end,
@@ -213,14 +260,14 @@ guis.on_init = function()
 
     global.usedItems = {}
     global.availableItems = {
-        ["water-barrel"] = 1,
+        ["water-barrel"] = {name="water-barrel", amount=1}
     }
     local resources = game.get_filtered_entity_prototypes{{filter="type",type="resource"}}
     for _, prototype in pairs(resources) do
         if prototype.resource_category:find("fluid") ~= nil then
-            global.availableItems[prototype.name .. "-barrel"] = 1
+            global.availableItems[prototype.name .. "-barrel"] = {name=prototype.name .. "-barrel", amount=1}
         else
-            global.availableItems[prototype.name] = 1
+            global.availableItems[prototype.name] = {name=prototype.name, amount=1}
         end
     end
 
@@ -229,6 +276,23 @@ guis.on_init = function()
     global.selected = {}
     for _, value in pairs(defines.direction) do
         global.selected[value] = {}
+    end
+end
+
+guis.on_configuration_changed = function(config_changed_data)
+    log("poop")
+    if config_changed_data.mod_changes["Factorissimo2-Playthrough"] then
+        for _, player in pairs(game.players) do
+            local main_frame = player.opened
+            if main_frame ~= nil and main_frame.entity ~= nil and main_frame.entity.name == "factory-input-combinator" then 
+                toggle_interface(player) 
+            end
+        end
+        for name, amount in pairs(global.availableItems) do
+            log(serpent.line(global.availableItems[name]))
+            global.availableItems[name] = {name=name, amount=amount}
+            log(serpent.line(global.availableItems[name]))
+        end
     end
 end
 
