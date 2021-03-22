@@ -117,6 +117,7 @@ local function set_item_input(direction, id, input)
     infinitychest.set_infinity_container_filter(1, {name=input, count=50, index=1})
 end
 local function set_fluid_input(direction, id, input)
+    log("setting fluid input")
     local fluidInput = input:sub(1, input:find("-barrel")-1)
     local indoorSurface = game.get_surface(global.factory.surface_name)
     local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
@@ -280,7 +281,6 @@ guis.on_init = function()
 end
 
 guis.on_configuration_changed = function(config_changed_data)
-    log("poop")
     if config_changed_data.mod_changes["Factorissimo2-Playthrough"] then
         for _, player in pairs(game.players) do
             local main_frame = player.opened

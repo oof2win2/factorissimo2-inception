@@ -1,8 +1,14 @@
 local mocks = require("prototypes.technology_mocks")
 local function create_research(resource)
+    -- log(resource.name)
     local first = table.deepcopy(mocks.level1)
+    log("creating research: " .. resource.name)
+    local resourcename = resource.minable.results and resource.minable.results[1] and resource.minable.results[1].type == "fluid" and resource.name .. "-barrel" or resource.name
+    log("resource name: " .. resourcename)
+    -- log(serpent.line(resource.minable.results and resource.minable.results[1]))
+    -- log(resource.minable.results and resource.minable.results[1] and (resource.minable.results[1].type .. "-barrel") or "unknown")
     first.icon = resource.icon
-    first.name = "factory-extra-" .. resource.name .. "-1"
+    first.name = "factory-extra-" .. resourcename .. "-1"
     first.icon_size = resource.icon_size
     first.icon_mipmaps = resource.icon_mipmaps
     if resource.localised_name then
@@ -12,20 +18,20 @@ local function create_research(resource)
     end
     data:extend({first})
     local i = 2
-    log(first.name)
+    -- log(serpent.block(resource))
     for _, mock in pairs(mocks.levels) do
         local tech = table.deepcopy(mock)
-        tech.name = "factory-extra-" .. resource.name .. "-" .. i
+        tech.name = "factory-extra-" .. resourcename  ..  "-" .. i
         tech.icon = resource.icon
         tech.icon_size = resource.icon_size
         tech.icon_mipmaps = resource.icon_mipmaps
-        tech.prerequisites = {"factory-extra-" .. resource.name .. "-" .. i-1}
+        tech.prerequisites = {"factory-extra-" .. resourcename .. "-" .. i-1}
         if resource.localised_name then
             tech.localised_name = "Extra " .. resource.localised_name .. " " .. i
         else
             tech.localised_name = "Extra " .. resource.name .. " " ..i
         end
-        log(tech.name)
+        -- log(tech.name)
         data:extend({tech})
         i = i + 1
     end
