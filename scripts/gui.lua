@@ -1,13 +1,9 @@
 local factoryStatic = require("statics.factoryInputs")
 
---[[
-    TODO: global.availableItems needs to be turned into an array
-    TODO: global.availableItems items need to be in format {name=name, amount=amount} so they can be accessed even if no more items area available (for removal and re-addition)
-]]
-
 local function create_buttons(player)
     local selector_filter = {}
     for _, item in pairs(global.availableItems) do
+        log(serpent.line(global.availableItems))
         if item.name and item.amount >= 1 then
             table.insert(selector_filter, {filter="name", name=item.name})
         end
@@ -15,7 +11,9 @@ local function create_buttons(player)
     if selector_filter[1] == nil then
         log("blank")
         table.insert(selector_filter, {filter="stack-size", comparison="=", value=100000})
+        log(serpent.line(selector_filter))
     end
+    log(serpent.line(selector_filter))
     
     local function createButtons(flow, button, direction)
         button.tags.direction = direction
@@ -45,7 +43,6 @@ local function create_buttons(player)
     createButtons(top_content.children[1], button, defines.direction.north)
     createButtons(bot_content.children[1], button, defines.direction.south)
 end
-
 local function create_interface(player)
     local screen = player.gui.screen
     local player_global = global.players[player.index]
@@ -92,7 +89,6 @@ local function create_interface(player)
         create_buttons(player)
     end
 end
-
 local function set_item_input(direction, id, input)
     local indoorSurface = game.get_surface(global.factory.surface_name)
     local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
@@ -197,14 +193,13 @@ local function on_gui_elem_changed(event)
     if event.element.tags == nil or event.element.tags.action ~= "f2pl_select_item" then return end
     local element = event.element
     global.selected[element.tags.direction][element.tags.num] = element.elem_value
+    remove_input(element.tags.direction, element.tags.num)
     if element.elem_value ~= nil and element.elem_value:find("barrel") == nil  then
         set_item_input(element.tags.direction, element.tags.num, element.elem_value)
         change_input(element.elem_value, -1)
     elseif element.elem_value ~= nil and element.elem_value:find("barrel") ~= nil then
         set_fluid_input(element.tags.direction, element.tags.num, element.elem_value)
         change_input(element.elem_value, -1)
-    else
-        remove_input(element.tags.direction, element.tags.num)
     end
     create_buttons(game.get_player(event.player_index))
 end
