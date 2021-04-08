@@ -3,17 +3,13 @@ local factoryStatic = require("statics.factoryInputs")
 local function create_buttons(player)
     local selector_filter = {}
     for _, item in pairs(global.availableItems) do
-        log(serpent.line(global.availableItems))
         if item.name and item.amount >= 1 then
             table.insert(selector_filter, {filter="name", name=item.name})
         end
     end
     if selector_filter[1] == nil then
-        log("blank")
         table.insert(selector_filter, {filter="stack-size", comparison="=", value=100000})
-        log(serpent.line(selector_filter))
     end
-    log(serpent.line(selector_filter))
     
     local function createButtons(flow, button, direction)
         button.tags.direction = direction
@@ -146,12 +142,12 @@ local function remove_input(direction, id)
     local inOffsetX = factoryStatic.indoorPos.offsets[direction].x[id]
     local inOffsetY = factoryStatic.indoorPos.offsets[direction].y[id]
 
-
     local chestPosition = { outdoorPos.chest[1]+outOffsetX+0.5, outdoorPos.chest[2]+outOffsetY+0.5 }
     local outdoorBeltPosition = { outdoorPos.belt[1]+outOffsetX+0.5, outdoorPos.belt[2]+outOffsetY+0.5 }
     local indoorBeltPosition = { indoorPos.belt[1]+inOffsetX+0.5, indoorPos.belt[2]+inOffsetY+0.5 }
     local indoorBulkpipePosition = { indoorPos.bulkpipe[1]+inOffsetX+0.5, indoorPos.bulkpipe[2]+inOffsetY+0.5 }
-    local outside = outdoorSurface.find_entities({outdoorBeltPosition, chestPosition})
+    local outside = outdoorSurface.find_entities({chestPosition, outdoorBeltPosition})
+    if outside[1] == nil then outside = outdoorSurface.find_entities({outdoorBeltPosition, chestPosition}) end
     local inside = indoorSurface.find_entities({indoorBulkpipePosition, indoorBeltPosition})
     for _, entity in pairs(outside) do
         if entity.name == "infinity-pipe" then
@@ -249,7 +245,7 @@ guis.events = {
                 global.availableItems[resource] = {name=resource, amount=1}
             end
         end
-    end,
+    end
 }
 guis.on_init = function()
     global.players = {}
@@ -284,9 +280,7 @@ guis.on_configuration_changed = function(config_changed_data)
             end
         end
         for name, amount in pairs(global.availableItems) do
-            log(serpent.line(global.availableItems[name]))
             global.availableItems[name] = {name=name, amount=amount}
-            log(serpent.line(global.availableItems[name]))
         end
     end
 end
