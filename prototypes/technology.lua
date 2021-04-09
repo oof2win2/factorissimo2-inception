@@ -12,7 +12,7 @@ local function create_research(resource)
     first.icon_size = resource.icon_size
     first.icon_mipmaps = resource.icon_mipmaps
     if resource.localised_name then
-        first.localised_name = "Extra " .. resource.localised_name
+        first.localised_name = {"", "Extra ", resource.localised_name}
     else
         first.localised_name = "Extra " .. resource.name
     end
