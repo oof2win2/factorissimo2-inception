@@ -4,7 +4,6 @@ data.raw["map-gen-presets"].default["default-factorissimo-pt"] =
 	basic_settings = {
 		width=48,
 		height=48,
-		peaceful_mode=true,
 		-- default_enable_all_autoplace_controls=false,
 		autoplace_controls = {
 			["enemy-base"] = {frequency=0}
