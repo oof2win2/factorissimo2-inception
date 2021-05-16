@@ -75,6 +75,7 @@ local on_player_created = function(event)
 
     -- create the main factory for the player and then raise the event so Factorissimo can do it's pairing
     -- of surfaces and the doors
+	-- placement of 10, 10 is due to me experimenting with EditorExtensions enabled and it placing things near 0,0
     local factory = surface.create_entity{name="factory-3", position = {x=10, y=10}, force="player", raise_built=true}
     global.factory = {}
     global.factory.name = "factory-3"
