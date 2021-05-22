@@ -7,9 +7,16 @@ local function create_research(resource)
     log("resource name: " .. resourcename)
     -- log(serpent.line(resource.minable.results and resource.minable.results[1]))
     -- log(resource.minable.results and resource.minable.results[1] and (resource.minable.results[1].type .. "-barrel") or "unknown")
-    first.icon = resource.icon
+    local icon, icon_size = resource.icon, resource.icon_size
+    if not icon then
+        icon = resource.icons[1].icon
+    end
+    if not icon_size then
+        icon_size = resource.icons[1].icon_size
+    end
     first.name = "factory-extra-" .. resourcename .. "-1"
-    first.icon_size = resource.icon_size
+    first.icon = icon
+    first.icon_size = icon_size
     first.icon_mipmaps = resource.icon_mipmaps
     if resource.localised_name then
         first.localised_name = {"", "Extra ", resource.localised_name}
@@ -22,8 +29,8 @@ local function create_research(resource)
     for _, mock in pairs(mocks.levels) do
         local tech = table.deepcopy(mock)
         tech.name = "factory-extra-" .. resourcename  ..  "-" .. i
-        tech.icon = resource.icon
-        tech.icon_size = resource.icon_size
+        tech.icon = icon
+        tech.icon_size = icon_size
         tech.icon_mipmaps = resource.icon_mipmaps
         tech.prerequisites = {"factory-extra-" .. resourcename .. "-" .. i-1}
         if resource.localised_name then
