@@ -85,6 +85,7 @@ local function create_interface(player)
         create_buttons(player)
     end
 end
+
 local function set_item_input(direction, id, input)
     local indoorSurface = game.get_surface(global.factory.surface_name)
     local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
@@ -115,8 +116,27 @@ local function set_item_input(direction, id, input)
 	inBeltE.force = "enemy"
 	infinitychest.force = "enemy"
 end
+local function get_item_input(direction, id)
+    local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
+    local outdoorPos = factoryStatic.outdoorPos.positions[direction]
+    local outOffsetX = factoryStatic.outdoorPos.offsets[direction].x[id]
+    local outOffsetY = factoryStatic.outdoorPos.offsets[direction].y[id]
+
+    local chestPosition = { outdoorPos.chest[1]+outOffsetX+0.5, outdoorPos.chest[2]+outOffsetY+0.5 }
+    local infinitychest = outdoorSurface.find_entity("infinity-chest", chestPosition)
+
+	if infinitychest ~= nil then 
+		local filter = infinitychest.get_infinity_container_filter(1)
+		if filter ~= nil then
+			return filter.name
+		end
+		return nil
+	end
+	
+	return nil
+end
+
 local function set_fluid_input(direction, id, input)
-    log("setting fluid input")
     local fluidInput = input:sub(1, input:find("-barrel")-1)
     local indoorSurface = game.get_surface(global.factory.surface_name)
     local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
@@ -140,6 +160,24 @@ local function set_fluid_input(direction, id, input)
 	outPipeE.force = "enemy"
 	inPipeE.force = "enemy"
 end
+local function get_fluid_input(direction, id)
+	local fluidInput = input:sub(1, input:find("-barrel")-1)
+    local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
+    local outdoorPos = factoryStatic.outdoorPos.positions[direction]
+    local outOffsetX = factoryStatic.outdoorPos.offsets[direction].x[id]
+    local outOffsetY = factoryStatic.outdoorPos.offsets[direction].y[id]
+
+    local infPipePosition = { outdoorPos.infpipe[1]+outOffsetX, outdoorPos.infpipe[2]+outOffsetY }
+    local infinitypipe = outdoorSurface.find_entity("infinity-pipe", infPipePosition)
+	
+	if infinitypipe ~= nil then 
+		local filter = infinitypipe.get_infinity_pipe_filter()
+		if filter then return filter.name end
+	end
+	
+	return nil
+end
+
 local function remove_input(direction, id)
     local indoorSurface = game.get_surface(global.factory.surface_name)
     local outdoorSurface = game.get_surface(global.factory.placed_on_surface_name)
@@ -222,6 +260,18 @@ local function toggle_interface(player)
     end
 end
 
+local function replaceBelts(origin, target)
+	for _, direction in ipairs(factoryStatic.directions) do
+		for id = 1, 8 do
+			local itemi = get_item_input(direction, id)
+			if itemi then
+				remove_input(direction, id)
+				set_item_input(direction, id, itemi)
+			end
+		end
+	end
+end
+
 local guis = {}
 guis.events = {
     [defines.events.on_gui_opened] = function(event)
@@ -244,8 +294,10 @@ guis.events = {
         if event.research.name == nil then return end
         if event.research.name == "factory-input-belt-2" then
             global.belt_tier_name = "fast-"
+			replaceBelts("transport-belt", "fast-transport-belt")
         elseif event.research.name == "factory-input-belt-3" then
             global.belt_tier_name = "express-"
+			replaceBelts("fast-transport-belt", "express-transport-belt")
         end
         if event.research.name:find("factory%-extra%-") ~= nil then
             local resource = event.research.name:sub(15):sub(1, -3)
