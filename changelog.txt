@@ -1,7 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.8
+Date: 2021-08-29
+  Bugfixes:
+    - Fixed belt inputs not getting upgraded
+    - Fixed allowing to get infinite pipes and belts
+---------------------------------------------------------------------------------------------------
 Version: 1.1.7
 Date: 2021-05-23
-  Bugfixed:
+  Bugfixes:
     - Fixed a crash when ores have multiple icons [authored by birdbrainswagtrain on 9870fd4]
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.6
