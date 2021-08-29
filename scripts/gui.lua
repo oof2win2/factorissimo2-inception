@@ -103,10 +103,17 @@ local function set_item_input(direction, id, input)
     local outdoorBeltPosition = { outdoorPos.belt[1]+outOffsetX, outdoorPos.belt[2]+outOffsetY }
     local indoorBeltPosition = { indoorPos.belt[1]+inOffsetX, indoorPos.belt[2]+inOffsetY }
     local infinitychest = outdoorSurface.create_entity{name="infinity-chest", position=chestPosition, force="player"}
-    outdoorSurface.create_entity{name=belt_tier_name.."loader", position=loaderPosition, force="player", type="output", direction=entityDirection}
-    outdoorSurface.create_entity{name=belt_tier_name.."transport-belt", position=outdoorBeltPosition, direction=entityDirection, force="player", raise_built=true}
-    indoorSurface.create_entity{name=belt_tier_name.."transport-belt", position=indoorBeltPosition, direction=entityDirection, force="player", raise_built=true}
+    local loaderE = outdoorSurface.create_entity{name=belt_tier_name.."loader", position=loaderPosition, force="player", type="output", direction=entityDirection}
+    local outBeltE = outdoorSurface.create_entity{name=belt_tier_name.."transport-belt", position=outdoorBeltPosition, direction=entityDirection, force="player", raise_built=true}
+    local inBeltE = indoorSurface.create_entity{name=belt_tier_name.."transport-belt", position=indoorBeltPosition, direction=entityDirection, force="player", raise_built=true}
     infinitychest.set_infinity_container_filter(1, {name=input, count=50, index=1})
+
+	-- this is done later because of Factorissimo not listening to events if the force of the entity and factory are different
+	-- prevent getting infinite belts
+	loaderE.force = "enemy"
+	outBeltE.force = "enemy"
+	inBeltE.force = "enemy"
+	infinitychest.force = "enemy"
 end
 local function set_fluid_input(direction, id, input)
     log("setting fluid input")
@@ -126,9 +133,12 @@ local function set_fluid_input(direction, id, input)
     local outdoorBulkpipePosition = { outdoorPos.bulkpipe[1]+outOffsetX, outdoorPos.bulkpipe[2]+outOffsetY }
     local indoorBulkpipePosition = { indoorPos.bulkpipe[1]+inOffsetX, indoorPos.bulkpipe[2]+inOffsetY }
     local infinitypipe = outdoorSurface.create_entity{name="infinity-pipe", position=infPipePosition, force="player"}
-    outdoorSurface.create_entity{name="factory-input-pipe", position=outdoorBulkpipePosition, force="player", type="output", direction=entityDirection, raise_built=true}
-    indoorSurface.create_entity{name="factory-output-pipe", position=indoorBulkpipePosition, direction=entityDirection, force="player", raise_built=true}
+    local outPipeE = outdoorSurface.create_entity{name="factory-input-pipe", position=outdoorBulkpipePosition, force="player", type="output", direction=entityDirection, raise_built=true}
+    local inPipeE = indoorSurface.create_entity{name="factory-output-pipe", position=indoorBulkpipePosition, direction=entityDirection, force="player", raise_built=true}
     infinitypipe.set_infinity_pipe_filter({name=fluidInput, percentage=100.0})
+
+	outPipeE.force = "enemy"
+	inPipeE.force = "enemy"
 end
 local function remove_input(direction, id)
     local indoorSurface = game.get_surface(global.factory.surface_name)
