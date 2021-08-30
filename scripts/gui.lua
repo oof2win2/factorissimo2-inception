@@ -334,17 +334,24 @@ guis.on_init = function()
 end
 
 guis.on_configuration_changed = function(config_changed_data)
-    if config_changed_data.mod_changes["Factorissimo2-Playthrough"] then
-        for _, player in pairs(game.players) do
-            local main_frame = player.opened
+	-- disable interface if it is open on mod change
+	for _, player in pairs(game.players) do
+		local main_frame = player.opened
+		if main_frame ~= nil and main_frame.entity ~= nil and main_frame.entity.name == "factory-input-combinator" then 
             if main_frame ~= nil and main_frame.entity ~= nil and main_frame.entity.name == "factory-input-combinator" then 
+		if main_frame ~= nil and main_frame.entity ~= nil and main_frame.entity.name == "factory-input-combinator" then 
+			toggle_interface(player) 
                 toggle_interface(player) 
-            end
-        end
+			toggle_interface(player) 
+		end
+	end
         for name, amount in pairs(global.availableItems) do
             global.availableItems[name] = {name=name, amount=amount}
         end
     end
+	-- fix belts if upgrading from 1.1.6 or below
+	local belt_name = global.belt_tier_name .. "transport-belt"
+	replaceBelts(belt_name, belt_name)
 end
 
 return guis
