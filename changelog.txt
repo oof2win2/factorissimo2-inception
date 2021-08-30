@@ -1,7 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.9
-Date: ????
-  Changes:
+Date: 2021-08-30
+  Bugfixes:
+    - Make the mod add missing resources when they were changed
+    - Replace belts when upgrading Factorissimo versions
+    - Remove a loop that existed for no reason and broke the mod
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.8
 Date: 2021-08-29
