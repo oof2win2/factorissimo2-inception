@@ -338,17 +338,25 @@ guis.on_configuration_changed = function(config_changed_data)
 	for _, player in pairs(game.players) do
 		local main_frame = player.opened
 		if main_frame ~= nil and main_frame.entity ~= nil and main_frame.entity.name == "factory-input-combinator" then 
-            if main_frame ~= nil and main_frame.entity ~= nil and main_frame.entity.name == "factory-input-combinator" then 
-		if main_frame ~= nil and main_frame.entity ~= nil and main_frame.entity.name == "factory-input-combinator" then 
-			toggle_interface(player) 
-                toggle_interface(player) 
 			toggle_interface(player) 
 		end
 	end
-        for name, amount in pairs(global.availableItems) do
-            global.availableItems[name] = {name=name, amount=amount}
+
+	-- add missing resources if new ones have been added with other mods
+	local resources = game.get_filtered_entity_prototypes{{filter="type",type="resource"}}
+    for _, prototype in pairs(resources) do
+        if prototype.resource_category:find("fluid") ~= nil then
+			if global.availableItems[prototype.name .. "-barrel"] == nil then
+            	global.availableItems[prototype.name .. "-barrel"] = {name=prototype.name .. "-barrel", amount=1}
+			end
+        else
+			if global.availableItems[prototype.name] == nil then
+            	global.availableItems[prototype.name] = {name=prototype.name, amount=1}
+			end
         end
     end
+
+
 	-- fix belts if upgrading from 1.1.6 or below
 	local belt_name = global.belt_tier_name .. "transport-belt"
 	replaceBelts(belt_name, belt_name)
