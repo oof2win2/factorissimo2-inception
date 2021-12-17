@@ -314,7 +314,8 @@ guis.on_init = function()
 
     global.usedItems = {}
     global.availableItems = {
-        ["water-barrel"] = {name="water-barrel", amount=1}
+        ["water-barrel"] = {name="water-barrel", amount=1},
+		["wood"] = {name="wood", amount=1}
     }
     local resources = game.get_filtered_entity_prototypes{{filter="type",type="resource"}}
     for _, prototype in pairs(resources) do
