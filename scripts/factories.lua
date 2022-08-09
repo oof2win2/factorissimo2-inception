@@ -67,7 +67,7 @@ local on_player_created = function(event)
     local player = game.get_player(event.player_index)
     if event.player_index ~= 1 then 
         -- teleport the player to the main factory surface
-        player.teleport({x=0, y=30}, "Factory floor 1")
+        player.teleport({x=0, y=30}, "factory-floor-1")
         return
     end
 
@@ -80,15 +80,15 @@ local on_player_created = function(event)
     global.factory = {}
     global.factory.name = "factory-3"
     global.factory.position = factory.position
-    global.factory.surface_name = "Factory floor 1"
+    global.factory.surface_name = "factory-floor-1"
     global.factory.placed_on_surface_name = factory.surface.name
 
     -- teleport the player to the main factory surface
-    player.teleport({x=0, y=30}, "Factory floor 1")
+    player.teleport({x=0, y=30}, "factory-floor-1")
 
     -- createOutsideStuff(surface)
 
-    local factorySurface = game.get_surface("Factory floor 1")
+    local factorySurface = game.get_surface("factory-floor-1")
     createFactoryStuff(factorySurface)
     global.combinator = factorySurface.create_entity{name="factory-input-combinator", position={x=4, y=31}, force="player"}
 
@@ -108,14 +108,14 @@ local on_player_respawned = function(event)
     local player = game.get_player(event.player_index)
     if player == nil then return game.print("Error getting player to teleport after respawn. Report to mod author") end
     -- teleport the player to the main factory surface
-    player.teleport({x=0, y=30}, "Factory floor 1")
+    player.teleport({x=0, y=30}, "factory-floor-1")
 end
 
 local on_cutscene_cancelled = function(event)
     local player = game.get_player(event.player_index)
     if player == nil or player.character == nil then return game.print("Error getting player to teleport after respawn. Report to mod author") end
     -- teleport the player to the main factory surface
-    player.teleport({x=0, y=30}, "Factory floor 1")
+    player.teleport({x=0, y=30}, "factory-floor-1")
 end
 
 local factories = {}
