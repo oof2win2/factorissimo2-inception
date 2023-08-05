@@ -114,7 +114,7 @@ local function set_item_input(direction, id, input)
 	local indoorBeltPosition = { indoorPos.belt[1] + inOffsetX, indoorPos.belt[2] + inOffsetY }
 	local infinitychest = outdoorSurface.create_entity { name = "infinity-chest", position = chestPosition, force =
 	"player" }
-	local loaderE = outdoorSurface.create_entity { name = belt_tier_name .. "loader", position = loaderPosition, force =
+	local loaderE = outdoorSurface.create_entity { name = "f2pl-fastest-loader", position = loaderPosition, force =
 	"player", type = "output", direction = entityDirection }
 	local outBeltE = outdoorSurface.create_entity { name = belt_tier_name .. "transport-belt", position =
 		outdoorBeltPosition, direction = entityDirection, force = "player", raise_built = true }
@@ -260,7 +260,7 @@ local function toggle_interface(player)
 	end
 end
 
-local function replaceBelts(target)
+local function replaceBelts()
 	for _, direction in ipairs(factoryStatic.directions) do
 		for id = 1, 8 do
 			local itemi = get_item_input(direction, id)
@@ -293,10 +293,26 @@ guis.events = {
 	[defines.events.on_research_finished] = function(event)
 		if event.research.name == nil then return end
 		if event.research.name:find("f2pl%-belt%-") then
-			local new_belt_name = event.research.name:sub(10)
-			print(new_belt_name)
-			global.belt_tier_name = new_belt_name .. "-"
-			replaceBelts(new_belt_name)
+			-- trim of f2pl-belt- and -transport-belt
+			local belt_tier_name = event.research.name:sub(11, -16)
+			local final_belt_name = belt_tier_name
+			if final_belt_name == "" then
+				final_belt_name = ""
+			else
+				final_belt_name = final_belt_name .. "-"
+			end
+
+			-- now we compare the speed of these belts to find the fastest one
+			-- as we set that to the input belt
+			-- so that the factory input belt is always the fastest one
+			local current_name = global.belt_tier_name .. "transport-belt"
+			local current_speed = game.entity_prototypes[current_name].belt_speed
+			local this_name = final_belt_name .. "transport-belt"
+			local this_speed = game.entity_prototypes[this_name].belt_speed
+			if this_speed > current_speed then
+				global.belt_tier_name = final_belt_name
+				replaceBelts()
+			end
 		end
 		if event.research.name:find("factory%-extra%-") ~= nil then
 			local resource = event.research.name:sub(15):sub(1, -3)
@@ -340,9 +356,8 @@ guis.on_init = function()
 	end
 
 	-- trim "-transport-belt" off the belt name
-	global.belt_tier_name = slowest_belt:sub(1, -16) .. "-"
-
-	-- TODO: get the fastest loader in the game and use that as the sole loader
+	local trimmed_belt_name = slowest_belt:sub(1, -16) .. "-"
+	global.belt_tier_name = trimmed_belt_name
 
 	global.selected = {}
 	for _, value in pairs(defines.direction) do
@@ -376,8 +391,7 @@ guis.on_configuration_changed = function(config_changed_data)
 	if global.did_1_1_6_fix == nil then
 		global.did_1_1_6_fix = true
 		-- fix belts if upgrading from 1.1.6 or below
-		local belt_name = global.belt_tier_name .. "transport-belt"
-		replaceBelts(belt_name)
+		replaceBelts()
 	end
 end
 

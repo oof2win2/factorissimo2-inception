@@ -3,6 +3,9 @@ Version: 1.1.11
 Date: ????
   Bugfixes:
     - Fixed incorrect localized name concatenation in technology prototypes
+  Changes:
+    - Add a special loader to allow the mod to support faster belts than the base game's
+    - Add support for modded belts as factory inputs
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.10
 Date: 2021-12-17

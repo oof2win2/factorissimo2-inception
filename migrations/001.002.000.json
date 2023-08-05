@@ -1,0 +1,12 @@
+{
+	"technology": [
+		[
+			"factory-input-belt-2",
+			"f2pl-belt-fast-transport-belt"
+		],
+		[
+			"factory-input-belt-3",
+			"f2pl-belt-express-transport-belt"
+		]
+	]
+}
