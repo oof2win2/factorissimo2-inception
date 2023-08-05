@@ -1,10 +1,10 @@
 local mocks = require("prototypes.technology_mocks")
-local function create_research(resource)
+local function create_resource_research(resource)
 	-- log(resource.name)
 	local first = table.deepcopy(mocks.level1)
 	log("creating research: " .. resource.name)
 	local resourcename = resource.minable.results and resource.minable.results[1] and
-	resource.minable.results[1].type == "fluid" and resource.name .. "-barrel" or resource.name
+		resource.minable.results[1].type == "fluid" and resource.name .. "-barrel" or resource.name
 	log("resource name: " .. resourcename)
 	-- log(serpent.line(resource.minable.results and resource.minable.results[1]))
 	-- log(resource.minable.results and resource.minable.results[1] and (resource.minable.results[1].type .. "-barrel") or "unknown")
@@ -46,5 +46,5 @@ local function create_research(resource)
 end
 
 for _, resource in pairs(data.raw.resource) do
-	create_research(resource)
+	create_resource_research(resource)
 end
