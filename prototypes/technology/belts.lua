@@ -9,7 +9,7 @@ print(serpent.line(belt_names))
 for _, tech in pairs(data.raw["technology"]) do
 	if tech.effects then
 		for _, effect in pairs(tech.effects) do
-			if effect.type == "unlock-recipe" then
+			if effect.type == "unlock-recipe" and data.raw.recipe[effect.recipe] then
 				local has_recipe = ""
 				-- the single recipe result is a string and it is the name of the belt
 				local result_name = data.raw.recipe[effect.recipe].result
