@@ -4,12 +4,22 @@ for _, belt in pairs(data.raw["transport-belt"]) do
 	belt_names[belt.name] = true
 end
 
-print(serpent.line(belt_names))
+-- Create an ordering of the belts by speed
+-- to be used in the backup code
+local belts_by_speed = {}
+for belt_name, _ in pairs(belt_names) do
+	belts_by_speed[#belts_by_speed+1] = belt_name
+end
+local ordering = function (b1, b2)
+	return data.raw["transport-belt"][b1].speed < data.raw["transport-belt"][b2].speed
+end
+table.sort(belts_by_speed, ordering)
+
 
 for _, tech in pairs(data.raw["technology"]) do
 	if tech.effects then
 		for _, effect in pairs(tech.effects) do
-			if effect.type == "unlock-recipe" then
+			if effect.type == "unlock-recipe" and data.raw.recipe[effect.recipe] then
 				local has_recipe = ""
 				-- the single recipe result is a string and it is the name of the belt
 				local result_name = data.raw.recipe[effect.recipe].result
@@ -65,21 +75,28 @@ for _, tech in pairs(data.raw["technology"]) do
 end
 
 
--- for the remaining techs, we need to add the belts as level 0 techs, EXCEPT for the slowest one
-local slowest_belt = nil
+-- For belt types where we do not have a natural parent technology we 
+-- create a separate level 0 technology. Two special cases:
+-- 1. We start with external connections using the slowest belt tech, 
+--    so no technology upgrading to this level is added.
+-- 2. For the upgrade to the first tier there is no prerequisite, as we
+--    do not know about a technology unlocking the belt itself, nor is 
+--    there a technology that upgrades the external connection to the
+--    previous belt tier (as that is the starting tier)
 for belt_name, _ in pairs(belt_names) do
-	if slowest_belt == nil then
-		slowest_belt = belt_name
-	else
-		if data.raw["transport-belt"][belt_name].speed < data.raw["transport-belt"][belt_name].speed then
-			slowest_belt = belt_name
-		end
+	-- Find speed index
+	local index = nil
+	for i, v in ipairs(belts_by_speed) do
+		if v == belt_name then index = i end
 	end
-end
-
--- now for the remaining belts, add them as level 0 techs
-for belt_name in pairs(belt_names) do
-	if belt_name ~= slowest_belt then
+	if index > 1 then -- Skip slowest belt
+		log("Adding tech for " .. belt_name)
+		prerequisites = {}
+		if index > 2 then
+			-- There is a tech upgrading to 1 tier lower belts
+			local prev_belt_name = belts_by_speed[index-1]
+			prerequisites = {"f2pl-belt-" .. prev_belt_name}
+		end
 		local item = data.raw.item[belt_name]
 		data:extend { {
 			type = "technology",
@@ -87,7 +104,7 @@ for belt_name in pairs(belt_names) do
 			icon = item.icon,
 			icon_size = item.icon_size,
 			icon_mipmaps = item.icon_mipmaps,
-			prerequisites = { "f2pl-belt-" .. slowest_belt },
+			prerequisites = prerequisites,
 			unit = {
 				count = 100,
 				ingredients = { { "automation-science-pack", 1 } },
